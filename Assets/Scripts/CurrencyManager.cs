@@ -66,7 +66,29 @@ public class CurrencyManager : MonoBehaviour
         OnDrpDwn1ValueChanged(baseCurrencyIndex);
         OnDrpDwn2ValueChanged(altCurrencyIndex);
 
-        //GetCurrencyRates(currencyNames[baseCurrencyIndex]);
+        if (datePicker)
+            datePicker.OnDateChanged += OnDateChanged;
+    }
+
+    /// <summary>
+    /// Gets new currency rates from the date specified.
+    /// </summary>
+    /// <param name="newDate"></param>
+    void OnDateChanged(string newDate)
+    {
+        GetCurrencyRates(newDate);
+
+        altCurrencyAmount = Calculate(baseCurrencyAmount, altCurrencyIndex);
+
+        if (inputField1)
+        {
+            inputField1.text = baseCurrencyAmount.ToString();
+        }
+
+        if (inputField2)
+        {
+            inputField2.text = altCurrencyAmount.ToString();
+        }
     }
 
     /// <summary>
@@ -80,7 +102,7 @@ public class CurrencyManager : MonoBehaviour
 
         baseCurrencyIndex = v;
 
-        GetCurrencyRates(currencyNames[baseCurrencyIndex]);
+        GetCurrencyRates(datePicker.GetDate());
 
         altCurrencyAmount = Calculate(baseCurrencyAmount, altCurrencyIndex);
 
@@ -197,10 +219,10 @@ public class CurrencyManager : MonoBehaviour
     /// Query currency rates from @https://api.exchangeratesapi.io
     /// </summary>
     /// <param name="baseCurrency"> The currency we want to convert from. </param>
-    void GetCurrencyRates(string baseCurrency)
+    void GetCurrencyRates(string date)
     {
         // Check if data is already queried once before.
-        string key = baseCurrency + datePicker.GetDate();
+        string key = currencyNames[baseCurrencyIndex] + date;
 
         // Check if the data is contained in our dictionary, then get it otherwise query new data from the internet.
         if (queriedData.ContainsKey(key))
@@ -219,23 +241,28 @@ public class CurrencyManager : MonoBehaviour
                 rate.name = name;
                 rate.value = o["rates"][name].Value<float>();
                 currency.rates[i] = rate;
-
+#if UNITY_EDITOR
                 Debug.Log(name + " : " + o["rates"][name].Value<float>());
+#endif
             }
+#if UNITY_EDITOR
 
             Debug.Log("\n-----------------------------------------------\n");
 
             Debug.Log("Used data queried once before");
+#endif
         }
         else
         {
-            string URL = @"https://api.exchangeratesapi.io/latest?base=" + baseCurrency;
+            string URL = @"https://api.exchangeratesapi.io/latest?base=" + currencyNames[baseCurrencyIndex];
 
             if (datePicker)
             {
-                Debug.Log("Querying Data as of Date: " + datePicker.GetDate());
+#if UNITY_EDITOR
 
-                URL = @"https://api.exchangeratesapi.io/" + datePicker.GetDate() + "?base=" + baseCurrency;
+                Debug.Log("Querying Data as of Date: " + datePicker.GetDate());
+#endif
+                URL = @"https://api.exchangeratesapi.io/" + datePicker.GetDate() + "?base=" + currencyNames[baseCurrencyIndex];
             }
 
             UnityWebRequest ww = new UnityWebRequest(URL);
@@ -248,7 +275,7 @@ public class CurrencyManager : MonoBehaviour
 
             ww.SendWebRequest();
 
-            while (!ww.isDone) ;
+            while (!ww.isDone);
 
             if (!string.IsNullOrEmpty(ww.error))
             {
@@ -278,10 +305,11 @@ public class CurrencyManager : MonoBehaviour
                 rate.name = name;
                 rate.value = o["rates"][name].Value<float>();
                 currency.rates[i] = rate;
-
+#if UNITY_EDITOR
                 Debug.Log(name + " : " + o["rates"][name].Value<float>());
+#endif
             }
-            Debug.Log("\n-----------------------------------------------\n");
+            //Debug.Log("\n-----------------------------------------------\n");
 
 #if false
             // TODO: Save data to be persistant for a whole day then update the next day.

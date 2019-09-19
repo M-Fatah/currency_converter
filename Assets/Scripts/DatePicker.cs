@@ -21,6 +21,8 @@ public class DatePicker : MonoBehaviour
 
     private DateTime today;
 
+    public System.Action<string> OnDateChanged;
+
     // TODO: check if date is valid.
     // Date format will be yyyy-mm-dd.
 
@@ -62,6 +64,8 @@ public class DatePicker : MonoBehaviour
 
         if (dayInputField)
             dayInputField.text = currentSelectedDay;
+
+        OnDateChanged?.Invoke(GetDate());
     }
 
     /// <summary>
@@ -83,6 +87,8 @@ public class DatePicker : MonoBehaviour
 
         if (monthInputField)
             monthInputField.text = currentSelectedMonth;
+
+        OnDateChanged?.Invoke(GetDate());
     }
 
     /// <summary>
@@ -104,6 +110,8 @@ public class DatePicker : MonoBehaviour
 
         if (yearInputField)
             yearInputField.text = currentSelectedYear;
+
+        OnDateChanged?.Invoke(GetDate());
     }
 
     /// <summary>
@@ -119,6 +127,8 @@ public class DatePicker : MonoBehaviour
 
         if (dayInputField)
             dayInputField.text = currentSelectedDay;
+
+        OnDateChanged?.Invoke(GetDate());
     }
 
     /// <summary>
@@ -134,6 +144,8 @@ public class DatePicker : MonoBehaviour
 
         if (monthInputField)
             monthInputField.text = currentSelectedMonth;
+
+        OnDateChanged?.Invoke(GetDate());
     }
 
     /// <summary>
@@ -149,6 +161,8 @@ public class DatePicker : MonoBehaviour
 
         if (yearInputField)
             yearInputField.text = currentSelectedYear;
+
+        OnDateChanged?.Invoke(GetDate());
     }
 
     /// <summary>
